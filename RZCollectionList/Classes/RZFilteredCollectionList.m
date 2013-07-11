@@ -44,6 +44,7 @@ typedef enum {
 @property (nonatomic, assign) RZFilteredSourceListContentChangeState contentChangeState;
 
 @property (nonatomic, assign) BOOL isTransformingForPredicateChange;
+@property (nonatomic, assign) BOOL useEmptySectionStub;
 
 - (void)setupIndexSetsForSourceList:(id<RZCollectionList>)sourceList predicate:(NSPredicate*)predicate;
 
@@ -88,8 +89,15 @@ typedef enum {
 
 - (id)initWithSourceList:(id<RZCollectionList>)sourceList predicate:(NSPredicate *)predicate
 {
+    return [self initWithSourceList:sourceList predicate:predicate useEmptyStub:NO];
+}
+
+- (id)initWithSourceList:(id<RZCollectionList>)sourceList predicate:(NSPredicate *)predicate useEmptyStub:(BOOL)useEmptyStub
+{
     if ((self = [super init]))
     {
+        self.useEmptySectionStub = useEmptyStub;
+        
         self.contentChangeState = RZFilteredSourceListContentChangeStateNoChanges;
         [self setupIndexSetsForSourceList:sourceList predicate:predicate];
         
@@ -101,6 +109,7 @@ typedef enum {
     
     return self;
 }
+
 
 - (void)dealloc
 {
@@ -150,7 +159,7 @@ typedef enum {
         
         [objectIndexesForSection addObject:[objectIndexes mutableCopy]];
         
-        if ([objectIndexes count] > 0)
+        if ([objectIndexes count] > 0 || self.useEmptySectionStub)
         {
             [sectionIndexes addIndex:idx];
         }
